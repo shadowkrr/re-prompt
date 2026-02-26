@@ -114,9 +114,10 @@ final class AlertWindowController: NSObject, NSWindowDelegate {
             frame: NSRect(x: 0, y: 0, width: Config.windowWidth, height: Config.windowHeight)
         )
 
-        let item = AVPlayerItem(url: url)
-        let player = AVQueuePlayer(playerItem: item)
-        let looper = AVPlayerLooper(player: player, templateItem: item)
+        let asset = AVAsset(url: url)
+        let templateItem = AVPlayerItem(asset: asset)
+        let player = AVQueuePlayer()
+        let looper = AVPlayerLooper(player: player, templateItem: templateItem)
 
         let playerView = AVPlayerView()
         playerView.player = player
