@@ -112,15 +112,21 @@ final class AlertWindowController: NSObject, NSWindowDelegate {
     // MARK: - Video
 
     private func createVideoView(url: URL) -> NSView {
+        let container = NSView(
+            frame: NSRect(x: 0, y: 0, width: Config.windowWidth, height: Config.windowHeight)
+        )
+
         let player = AVPlayer(url: url)
         let playerView = AVPlayerView()
         playerView.player = player
         playerView.controlsStyle = .none
-        playerView.frame = NSRect(
-            x: 0, y: 0,
-            width: Config.windowWidth,
-            height: Config.windowHeight
-        )
+        playerView.frame = container.bounds
+        playerView.autoresizingMask = [.width, .height]
+        container.addSubview(playerView)
+
+        // テキストオーバーレイ
+        let overlay = createOverlayLabel()
+        container.addSubview(overlay)
 
         // ループ再生
         loopObserver = NotificationCenter.default.addObserver(
@@ -134,7 +140,7 @@ final class AlertWindowController: NSObject, NSWindowDelegate {
 
         player.play()
         self.player = player
-        return playerView
+        return container
     }
 
     // MARK: - Image + Audio
