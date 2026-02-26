@@ -1,0 +1,17 @@
+# Build artifacts
+/RePrompt
+/RePrompt.app/
+.build/
+
+# macOS
+.DS_Store
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+
+# Swift Package Manager
+.swiftpm/
+
+# Claude Code
+.claude/
