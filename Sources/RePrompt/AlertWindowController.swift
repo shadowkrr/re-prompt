@@ -4,9 +4,9 @@ import AVKit
 
 final class AlertWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
-    private var player: AVPlayer?
+    private var player: AVQueuePlayer?
+    private var playerLooper: AVPlayerLooper?
     private var audioPlayer: AVAudioPlayer?
-    private var loopObserver: Any?
 
     /// ユーザーが手動でウィンドウを閉じたときのコールバック
     var onDismiss: (() -> Void)?
@@ -56,10 +56,8 @@ final class AlertWindowController: NSObject, NSWindowDelegate {
     // MARK: - Playback Control
 
     private func stopPlayback() {
-        if let observer = loopObserver {
-            NotificationCenter.default.removeObserver(observer)
-            loopObserver = nil
-        }
+        playerLooper?.disableLooping()
+        playerLooper = nil
         player?.pause()
         player = nil
         audioPlayer?.stop()
@@ -116,7 +114,10 @@ final class AlertWindowController: NSObject, NSWindowDelegate {
             frame: NSRect(x: 0, y: 0, width: Config.windowWidth, height: Config.windowHeight)
         )
 
-        let player = AVPlayer(url: url)
+        let item = AVPlayerItem(url: url)
+        let player = AVQueuePlayer(playerItem: item)
+        let looper = AVPlayerLooper(player: player, templateItem: item)
+
         let playerView = AVPlayerView()
         playerView.player = player
         playerView.controlsStyle = .none
@@ -128,18 +129,9 @@ final class AlertWindowController: NSObject, NSWindowDelegate {
         let overlay = createOverlayLabel()
         container.addSubview(overlay)
 
-        // ループ再生
-        loopObserver = NotificationCenter.default.addObserver(
-            forName: .AVPlayerItemDidPlayToEndTime,
-            object: player.currentItem,
-            queue: .main
-        ) { [weak player] _ in
-            player?.seek(to: .zero)
-            player?.play()
-        }
-
         player.play()
         self.player = player
+        self.playerLooper = looper
         return container
     }
 

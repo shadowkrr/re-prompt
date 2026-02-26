@@ -83,6 +83,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         idleMonitor = IdleMonitor(threshold: Config.idleThreshold)
         idleMonitor.delegate = self
         idleMonitor.start()
+
+        // メニューバーにカウント表示（デバッグ用）
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            let idle = Int(self.idleMonitor.currentIdleTime)
+            let threshold = Int(self.idleMonitor.threshold)
+            self.statusItem.button?.title = "Re:P \(idle)/\(threshold)"
+        }
     }
 
     // MARK: - Media Directory
